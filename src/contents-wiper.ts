@@ -3,12 +3,7 @@ import * as path from 'path';
 import * as jsdom from 'jsdom';
 import * as files from './utils/files';
 
-export const decontents = (inputFolderPath: string, decontentedFolderPath) => {
-  // copy dirs
-  files.getDirs(inputFolderPath).forEach((dir) => {
-    fs.mkdirSync(path.resolve(decontentedFolderPath, dir), { recursive: true });
-  });
-
+export const decontentsFolder = (inputFolderPath: string, decontentedFolderPath) => {
   // copy css files
   const cssFiles = files.getFiles(inputFolderPath, '.css');
   cssFiles.forEach((cssFile) => {
@@ -34,5 +29,13 @@ export const decontents = (inputFolderPath: string, decontentedFolderPath) => {
       contentsMatch = !!htmlDom.window.document.title?.trim().match(/(Contents|contents|目录)/g);
     }
     console.log('wipping contents:' + htmFile);
+  });
+};
+
+export const decontents = (inputFolderPath: string, decontentedFolderPath: string) => {
+  // copy dirs
+  files.getDirs(inputFolderPath).forEach((dir) => {
+    fs.mkdirSync(path.resolve(decontentedFolderPath, dir), { recursive: true });
+    decontentsFolder(path.resolve(inputFolderPath, dir), path.resolve(decontentedFolderPath, dir));
   });
 };

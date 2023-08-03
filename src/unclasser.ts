@@ -9,18 +9,10 @@ import * as files from './utils/files';
  * @param inputFolderPath directory of the input folder
  * @param unclassedFolderPath directory of the output folder
  */
-export const unclass = (inputFolderPath: string, unclassedFolderPath: string) => {
-  // copy dirs
-  files.getDirs(inputFolderPath).forEach((dir) => {
-    fs.mkdirSync(path.resolve(unclassedFolderPath, dir), { recursive: true });
-  });
-
+export const unclassFolder = (inputFolderPath: string, unclassedFolderPath: string) => {
   // Get all CSS and HTML files in the input folder
   const cssFiles = files.getFiles(inputFolderPath, '.css');
-  const htmlFiles = [
-    ...files.getFiles(inputFolderPath, '.html'),
-    ...files.getFiles(inputFolderPath, '.htm'),
-  ];
+  const htmFiles = files.getFiles(inputFolderPath, '.htm');
 
   // Get all styled classnames in the CSS files
   let classArray: string[] = [];
@@ -30,15 +22,23 @@ export const unclass = (inputFolderPath: string, unclassedFolderPath: string) =>
   });
 
   // Remove elements with the styled classnames from the HTML files
-  htmlFiles.forEach((htmlFile) => {
-    const htmlContent = fs.readFileSync(path.resolve(inputFolderPath, htmlFile), 'utf-8');
+  htmFiles.forEach((htmFile) => {
+    const htmlContent = fs.readFileSync(path.resolve(inputFolderPath, htmFile), 'utf-8');
     const htmlDom = new jsdom.JSDOM(htmlContent);
     classArray.forEach((className) => {
       htmlDom.window.document.querySelectorAll(className).forEach((element) => {
         element.remove();
       });
     });
-    fs.writeFileSync(path.resolve(unclassedFolderPath, htmlFile), htmlDom.serialize(), 'utf-8');
-    console.log('unclassing:' + htmlFile);
+    fs.writeFileSync(path.resolve(unclassedFolderPath, htmFile), htmlDom.serialize(), 'utf-8');
+    console.log('unclassing:' + htmFile);
+  });
+};
+
+export const unclass = (inputFolderPath: string, unclassedFolderPath: string) => {
+  // copy dirs
+  files.getDirs(inputFolderPath).forEach((dir) => {
+    fs.mkdirSync(path.resolve(unclassedFolderPath, dir), { recursive: true });
+    unclassFolder(path.resolve(inputFolderPath, dir), path.resolve(unclassedFolderPath, dir));
   });
 };

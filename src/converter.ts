@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as jsdom from 'jsdom';
 import * as files from './utils/files';
 
-export const html2text = (inputFolderPath: string, textFolderPath: string) => {
+export const html2textFolder = (inputFolderPath: string, textFolderPath: string) => {
   // copy dirs
   fs.mkdirSync(path.resolve(textFolderPath), { recursive: true });
   // files.getDirs(inputFolderPath).forEach((dir) => {
@@ -26,5 +26,12 @@ export const html2text = (inputFolderPath: string, textFolderPath: string) => {
       ? fs.appendFileSync(saveFile, textContent, 'utf-8')
       : fs.writeFileSync(saveFile, textContent, 'utf-8');
     console.log('converting:' + htmFile);
+  });
+};
+
+export const html2text = (inputFolderPath: string, textFolderPath: string) => {
+  // copy dirs
+  files.getDirs(inputFolderPath).forEach((dir) => {
+    html2textFolder(path.resolve(inputFolderPath, dir), path.resolve(textFolderPath, dir));
   });
 };
