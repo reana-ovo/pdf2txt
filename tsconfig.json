@@ -2,7 +2,10 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
-    "moduleResolution": "NodeNext"
+    "moduleResolution": "NodeNext",
+    "paths": {
+      "@adobe/pdfservices-node-sdk": ["./src/types/acrobat.d.ts"]
+    }
   },
   "include": ["src/**/*"]
 }
