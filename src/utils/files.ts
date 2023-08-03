@@ -14,6 +14,12 @@ export const getFiles = (folderPath: string, extention?: string) => {
     lstatSync(resolve(folderPath, file)).isFile() &&
       (extention ? file.endsWith(extention) && files.push(file) : files.push(file));
   });
+
+  // Sort htm files
+  files.sort((a, b) => {
+    return Number.parseInt(a.match(/\d+/g).pop()) - Number.parseInt(b.match(/\d+/g).pop());
+  });
+
   return files;
 };
 
