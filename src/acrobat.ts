@@ -19,7 +19,7 @@ export const extractTextWithStyles = () => {
   // Create a new operation instance.
   const extractPDFOperation = acrobat.ExtractPDF.Operation.createNew(),
     input = acrobat.FileRef.createFromLocalFile(
-      'origin/阿特米斯3.pdf',
+      'origin/纳兰词（上卷）.pdf',
       acrobat.ExtractPDF.SupportedSourceFormat.pdf,
     );
 
@@ -29,11 +29,17 @@ export const extractTextWithStyles = () => {
   // Set options
   extractPDFOperation.setOptions(options);
 
+  // Create client config instance with the specified region.
+  const clientConfig = acrobat.ClientConfig.clientConfigBuilder()
+    .withConnectTimeout(10000)
+    .withReadTimeout(60000)
+    .build();
+
   //Generating a file name
-  let outputFilePath = '.handling/acrobat/阿特米斯3.zip';
+  let outputFilePath = '.handling/acrobat/纳兰词（上卷）.json';
 
   extractPDFOperation
-    .execute(acrobat.ExecutionContext.create(credentials))
+    .execute(acrobat.ExecutionContext.create(credentials, clientConfig))
     .then((result) => result.saveAsFile(outputFilePath))
     .catch((err) => {
       if (
