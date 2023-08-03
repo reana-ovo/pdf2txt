@@ -25,5 +25,6 @@ export const html2text = (inputFolderPath: string, textFolderPath: string) => {
     fs.existsSync(saveFile)
       ? fs.appendFileSync(saveFile, textContent, 'utf-8')
       : fs.writeFileSync(saveFile, textContent, 'utf-8');
+    console.log('converting:' + htmFile);
   });
 };

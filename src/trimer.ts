@@ -12,5 +12,6 @@ export const trim = (inputFolderPath: string, trimmedFolderPath: string) => {
       '$1$2',
     );
     fs.writeFileSync(path.resolve(trimmedFolderPath, file), fileContent, 'utf8');
+    console.log('trimming:' + file);
   });
 };

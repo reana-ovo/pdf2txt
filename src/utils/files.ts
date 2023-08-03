@@ -16,9 +16,10 @@ export const getFiles = (folderPath: string, extention?: string) => {
   });
 
   // Sort htm files
-  files.sort((a, b) => {
-    return Number.parseInt(a.match(/\d+/g).pop()) - Number.parseInt(b.match(/\d+/g).pop());
-  });
+  extention === '.htm' &&
+    files.sort((a, b) => {
+      return Number.parseInt(a.match(/\d+/g).pop()) - Number.parseInt(b.match(/\d+/g).pop());
+    });
 
   return files;
 };

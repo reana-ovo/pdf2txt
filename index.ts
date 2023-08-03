@@ -14,14 +14,14 @@ const decontentsFolderPath = path.resolve('.handling/decontents/');
 const unclassedFolderPath = path.resolve('.handling/unclassed/');
 const textFolderPath = path.resolve('.handling/text/');
 
-// clean up temporary files
-cleaner.cleanup(exportFolderPath);
+// // clean up temporary files
+// cleaner.cleanup(exportFolderPath);
 
-// format files using prettier
-formater.formatFolder(originFolderPath, formattedFolderPath);
+// // format files using prettier
+// formater.formatFolder(originFolderPath, formattedFolderPath);
 
-// remove files before contents
-contentsWiper.decontents(formattedFolderPath, decontentsFolderPath);
+// // remove files before contents
+// contentsWiper.decontents(formattedFolderPath, decontentsFolderPath);
 
 // remove html elements with styled classes
 unclasser.unclass(decontentsFolderPath, unclassedFolderPath);

@@ -34,5 +34,6 @@ export const formatFolder = (inputFolderPath: string, formattedFolderPath: strin
   // format files
   files.getFiles(inputFolderPath).forEach((file) => {
     formatFile(path.resolve(inputFolderPath, file), path.resolve(formattedFolderPath, file));
+    console.log('formatting:' + file);
   });
 };

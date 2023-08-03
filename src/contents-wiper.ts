@@ -33,5 +33,6 @@ export const decontents = (inputFolderPath: string, decontentedFolderPath) => {
       const htmlDom = new jsdom.JSDOM(htmlContent);
       contentsMatch = !!htmlDom.window.document.title?.trim().match(/(Contents|contents|目录)/g);
     }
+    console.log('wipping contents:' + htmFile);
   });
 };

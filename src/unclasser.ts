@@ -39,5 +39,6 @@ export const unclass = (inputFolderPath: string, unclassedFolderPath: string) =>
       });
     });
     fs.writeFileSync(path.resolve(unclassedFolderPath, htmlFile), htmlDom.serialize(), 'utf-8');
+    console.log('unclassing:' + htmlFile);
   });
 };

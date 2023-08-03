@@ -2,7 +2,7 @@
   "name": "htm-data-handler",
   "version": "0.0.1",
   "scripts": {
-    "handler": "ts-node index.ts",
+    "handler": "NODE_OPTIONS='--max-old-space-size=8192' ts-node index.ts",
     "prepare": "husky install"
   },
   "dependencies": {
