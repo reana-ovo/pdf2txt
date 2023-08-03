@@ -26,7 +26,7 @@ export const unclass = (inputFolderPath: string, unclassedFolderPath: string) =>
   let classArray: string[] = [];
   cssFiles.forEach((cssFile) => {
     const cssContent = fs.readFileSync(path.resolve(inputFolderPath, cssFile), 'utf-8');
-    classArray.push(...cssContent.match(/(?<=\s+[^{}]*)\.[^\s,]+(?=( |,)[^{}]*{)/g));
+    classArray.push(...(cssContent.match(/(?<=\s+[^{}]*)\.[^\s,]+(?=( |,)[^{}]*{)/g) || []));
   });
 
   // Remove elements with the styled classnames from the HTML files
