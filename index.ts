@@ -20,7 +20,7 @@ cleaner.cleanup(exportFolderPath);
 // format files using prettier
 formater.formatFolder(originFolderPath, formattedFolderPath);
 
-// remove files before contents
+// remove files of contents
 contentsWiper.decontents(formattedFolderPath, decontentsFolderPath);
 
 // remove html elements with styled classes
@@ -33,4 +33,4 @@ converter.html2text(unclassedFolderPath, textFolderPath);
 trimer.trim(textFolderPath, exportFolderPath);
 
 // clean up temporary files
-cleaner.cleanup(tempFolderPath);
+// cleaner.cleanup(tempFolderPath);

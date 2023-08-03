@@ -13,21 +13,18 @@ export const decontentsFolder = (inputFolderPath: string, decontentedFolderPath)
     );
   });
 
-  // delete files before contents
+  // delete files of contents
   const htmFiles = files.getFiles(inputFolderPath, '.htm');
   let contentsMatch = false;
 
   htmFiles.forEach((htmFile) => {
-    if (contentsMatch) {
+    const htmlContent = fs.readFileSync(path.resolve(inputFolderPath, htmFile), 'utf-8');
+    const htmlDom = new jsdom.JSDOM(htmlContent);
+    !htmlDom.window.document.title?.trim().match(/(Contents|contents|目录)/g) &&
       fs.copyFileSync(
         path.resolve(inputFolderPath, htmFile),
         path.resolve(decontentedFolderPath, htmFile),
       );
-    } else {
-      const htmlContent = fs.readFileSync(path.resolve(inputFolderPath, htmFile), 'utf-8');
-      const htmlDom = new jsdom.JSDOM(htmlContent);
-      contentsMatch = !!htmlDom.window.document.title?.trim().match(/(Contents|contents|目录)/g);
-    }
     console.log('wipping contents:' + htmFile);
   });
 };

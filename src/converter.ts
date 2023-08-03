@@ -4,12 +4,6 @@ import * as jsdom from 'jsdom';
 import * as files from './utils/files';
 
 export const html2textFolder = (inputFolderPath: string, textFolderPath: string) => {
-  // copy dirs
-  fs.mkdirSync(path.resolve(textFolderPath), { recursive: true });
-  // files.getDirs(inputFolderPath).forEach((dir) => {
-  //   fs.mkdirSync(path.resolve(textFolderPath, dir), { recursive: true });
-  // });
-
   // Get all HTM files in the input folder
   const htmFiles = files.getFiles(inputFolderPath, '.htm');
 
@@ -31,7 +25,9 @@ export const html2textFolder = (inputFolderPath: string, textFolderPath: string)
 
 export const html2text = (inputFolderPath: string, textFolderPath: string) => {
   // copy dirs
+  fs.mkdirSync(path.resolve(textFolderPath), { recursive: true });
   files.getDirs(inputFolderPath).forEach((dir) => {
     html2textFolder(path.resolve(inputFolderPath, dir), path.resolve(textFolderPath, dir));
+    console.log('converting:' + dir);
   });
 };
