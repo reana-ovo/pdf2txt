@@ -5,13 +5,13 @@ import * as converter from './src/converter';
 import * as cleaner from './src/cleaner';
 
 const originFolderPath = path.resolve('origin/');
-const exportPath = path.resolve('export/');
+const exportFolderPath = path.resolve('export/');
 const tempFolderPath = path.resolve('.handling/');
 const formattedFolderPath = path.resolve('.handling/formatted/');
 const unclassedFolderPath = path.resolve('.handling/unclassed/');
 
 // clean up temporary files
-cleaner.cleanup(exportPath);
+cleaner.cleanup(exportFolderPath);
 
 // format files using prettier
 formater.formatFolder(originFolderPath, formattedFolderPath);
@@ -20,7 +20,7 @@ formater.formatFolder(originFolderPath, formattedFolderPath);
 unclasser.unclass(formattedFolderPath, unclassedFolderPath);
 
 // convert html files to plain text
-converter.html2text(unclassedFolderPath, exportPath);
+converter.html2text(unclassedFolderPath, exportFolderPath);
 
 // clean up temporary files
 cleaner.cleanup(tempFolderPath);
