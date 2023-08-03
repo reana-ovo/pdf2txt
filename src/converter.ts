@@ -13,6 +13,11 @@ export const html2text = (inputFolderPath: string, textFolderPath: string) => {
   // Get all HTM files in the input folder
   const htmFiles = files.getFiles(inputFolderPath, '.htm');
 
+  // Sort htm files
+  htmFiles.sort((a, b) => {
+    return Number.parseInt(a.match(/\d+/g).pop()) - Number.parseInt(b.match(/\d+/g).pop());
+  });
+
   // Extract every text from html files
   htmFiles.forEach((htmFile) => {
     const saveFile = path.dirname(path.resolve(textFolderPath, htmFile)) + '.txt';
