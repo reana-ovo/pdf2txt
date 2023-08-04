@@ -33,4 +33,4 @@ converter.html2text(unclassedFolderPath, textFolderPath);
 trimer.trim(textFolderPath, exportFolderPath);
 
 // clean up temporary files
-// cleaner.cleanup(tempFolderPath);
+cleaner.cleanup(tempFolderPath);
