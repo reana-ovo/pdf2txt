@@ -19,7 +19,7 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
     // CMapReaderFactory,
     cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist/cmaps/',
     cMapPacked: true,
-    // useWorkerFetch: true,
+    useWorkerFetch: true,
   });
   const pdfDoc = await pdfDocLoader.promise;
   const pageAmount = pdfDoc.numPages;
@@ -35,7 +35,7 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
       // CMapReaderFactory,
       cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/cmaps/',
       cMapPacked: true,
-      // useWorkerFetch: true,
+      useWorkerFetch: true,
     });
     const pdfDoc = await pdfDocLoader.promise;
 
