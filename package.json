@@ -1,0 +1,32 @@
+{
+  "name": "htm-data-handler",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "handler": "ts-node --esm --files index.ts",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "log-update": "^5.0.1",
+    "pdf2json": "^3.0.4",
+    "pdfjs-dist": "^3.9.179"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.6.7",
+    "@commitlint/config-conventional": "^17.6.7",
+    "@types/lodash": "^4.14.197",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^8.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "volta": {
+    "node": "18.17.0"
+  }
+}

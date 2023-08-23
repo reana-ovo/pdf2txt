@@ -1,0 +1,7 @@
+/origin
+/export
+/node_modules
+/.husky
+package*.json
+commitlint.config.cjs
+.gitignore
