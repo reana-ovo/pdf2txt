@@ -260,11 +260,15 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
 
         // Save previous line
         integratedLine.styleIndex === 0 && mainStyles.length !== 0
-          ? (mainLineItems[mainLineItems.length - 1] = prevLineOfSameStyle)
+          ? (mainLineItems[
+              mainLineItems.findLastIndex((lineItem) => lineItem.text.trim().length !== 0)
+            ] = prevLineOfSameStyle)
           : integratedLine.styleIndex === mainStyles.length
           ? null
           : (subLineItems[integratedLine.styleIndex - 1][
-              subLineItems[integratedLine.styleIndex - 1].length - 1
+              subLineItems[integratedLine.styleIndex - 1].findLastIndex(
+                (subLineItem) => subLineItem.text.trim().length !== 0,
+              )
             ] = <SubLineItem>prevLineOfSameStyle);
 
         // Save current line
