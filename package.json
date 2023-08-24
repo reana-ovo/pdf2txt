@@ -1,6 +1,6 @@
 {
-  "name": "htm-data-handler",
-  "version": "0.0.1",
+  "name": "pdf2text",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "handler": "ts-node --esm --files index.ts",

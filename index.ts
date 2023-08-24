@@ -5,13 +5,13 @@ import * as converter from './src/converter.js';
 import * as transformer from './src/transformer.js';
 import * as extractor from './src/extractor.js';
 
+import * as scanner from './src/utils/scanner.js';
+
 const logFolderPath = path.resolve('log/');
 const originFolderPath = path.resolve('origin/');
 const convertFolderPath = path.resolve('.handling/convert/');
 const transformFolderPath = path.resolve('.handling/transform/');
 const extractFolderPath = path.resolve('.handling/extract/');
-// const formattedFolderPath = path.resolve('.handling/formatted/');
-// const unclassedFolderPath = path.resolve('.handling/unclassed/');
 
 // Async size
 const ASYNC_POOL_SIZE = 4;
