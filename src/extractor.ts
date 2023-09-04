@@ -21,7 +21,7 @@ export const extractText = (jsonFilesFolderPath: string, outputFolderPath: strin
   logger.updateLog(path.basename(jsonFilesFolderPath), 'extracting', jsonFilesPath.length);
 
   // Read json file data
-  jsonFilesPath.forEach((jsonFilePath, index) => {
+  jsonFilesPath.forEach((jsonFilePath) => {
     // Logger
     logger.updateLog(path.basename(jsonFilesFolderPath));
 
@@ -70,8 +70,7 @@ export const extractText = (jsonFilesFolderPath: string, outputFolderPath: strin
     // Trash
     const trashText =
       groupedLines.trash?.reduce((text: string, curr) => {
-        // TODO: Remove position testing
-        text += `[${index + 1}:${curr.mainPos}:${curr.inline}]:`.padEnd(20, ' ') + curr.text + '\n';
+        text += curr.text + '\n';
         return text;
       }, '') ?? '';
 

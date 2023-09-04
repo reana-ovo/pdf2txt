@@ -11,14 +11,6 @@ interface MainStyle {
   lineHeight: number;
 }
 
-interface TextStat {
-  textHeight: number;
-  lineHeight: number;
-  indent: number;
-}
-
-type TextStats = TextStat[];
-
 interface TextContent {
   items: TextContentItem[];
   styles: { [fontName: string]: TextContentStyle };
@@ -50,6 +42,7 @@ interface LineItem {
   text: string;
   pos: ItemPosition;
   EOL: boolean;
+  issues?: string[];
 }
 
 interface SubLineItem extends LineItem {
@@ -80,4 +73,11 @@ interface GroupedLines {
   main: LineItem[];
   sub: SubLineItem[][];
   trash: TrashItem[];
+}
+
+interface Issue {
+  name: string;
+  page?: number;
+  mainPos?: number;
+  columnIndex?: number;
 }

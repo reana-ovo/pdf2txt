@@ -33,13 +33,26 @@ export const init = (logFolderPath: string, workerAmount: number) => {
 
   // Rewrite console.log
   console.log = (...data: any[]) => {
-    logFile.write('[' + new Date().toISOString() + ']<LOG>: ');
-    logFile.write(util.format.apply(null, data) + '\n');
+    // Print current state
+    logFile.write(
+      '[' +
+        new Date().toISOString() +
+        ']<INFO>: ' +
+        logText +
+        '\n' +
+        '[' +
+        new Date().toISOString() +
+        ']<LOG>: ' +
+        util.format.apply(null, data) +
+        '\n',
+    );
   };
 
-  // Rewrite console.info
-  console.info = (...data: any[]) => {
-    logFile.write('[' + new Date().toISOString() + ']<INFO>: ');
+  // Rewrite console.error
+  console.error = (...data: any[]) => {
+    // Print current state
+    logFile.write('[' + new Date().toISOString() + ']<INFO>: ' + logText);
+    logFile.write('[' + new Date().toISOString() + ']<ERROR>: ');
     logFile.write(util.format.apply(null, data) + '\n');
   };
 
@@ -88,12 +101,12 @@ export const updateLog = (name: string, state?: string, number?: number) => {
     : logText.concat(`${name} ${state}${number ? ' (0/' + number + ')' : ''}\n`);
   logUpdateStream(
     logText +
-      `${frames.at(frameIndex)} Processing(${workerCurr}/${workerTotal}) ${
-        (Date.now() - start) / 1000
-      }s`,
+      `${frames.at(frameIndex)} Processing(${workerCurr}/${workerTotal}) ${Math.floor(
+        (Date.now() - start) / 1000 / 60,
+      )
+        .toString()
+        .padStart(2, '0')}:${(((Date.now() - start) / 1000) % 60).toFixed(2).padStart(5, '0')}`,
   );
-  // TODO: Remove useless file log
-  // console.info(logText.match(logNameRegex)?.[0] ?? 'Update log failed');
 
   // Update frame change timer
   lastFrameUpdate =

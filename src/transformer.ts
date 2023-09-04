@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import * as logger from './utils/logger.js';
 import * as scanner from './utils/scanner.js';
 import * as fileManager from './utils/fileManager.js';
+import * as tracker from './utils/tracker.js';
 
 // TODO: Testing value (Default: 0.01)
 const BASELINE_BIAS_FACT_THLD = 0.01;
@@ -13,7 +14,8 @@ const LINESTART_BIAS_FACT_THLD = 0.9;
 
 export const transform = (jsonFilesFolderPath: string, outputFolderPath: string) => {
   // Create output folder
-  fs.mkdirSync(path.resolve(outputFolderPath, path.basename(jsonFilesFolderPath)), {
+  const outputFilesFolderPath = path.resolve(outputFolderPath, path.basename(jsonFilesFolderPath));
+  fs.mkdirSync(outputFilesFolderPath, {
     recursive: true,
   });
 
@@ -36,6 +38,9 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
     // Logger
     logger.updateLog(path.basename(jsonFilesFolderPath));
 
+    // Get page number
+    const pageNumber = Number.parseInt(jsonFile.match(/(\d+)\..*$/)?.at(1));
+
     // Get page line data from text content
     const textContentLines: [number, ...TextContentItem[]][] = [];
     // Init the first line with group trash
@@ -46,10 +51,10 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
         ...textContentItem,
         // Remove the align spaces
         str: textContentItem.str.match(
-          /^(?:\p{P}*(?:\p{Unified_Ideograph}|\p{P})\p{P}*(?:\s+|\p{P}+))+\p{P}*(?:\p{Unified_Ideograph}|\p{P})\p{P}*$/u,
+          /^\s*(?:\p{P}*(?:\p{Unified_Ideograph}|\p{P})\p{P}*(?:\s+|\p{P}+))+\p{P}*(?:\p{Unified_Ideograph}|\p{P})\p{P}*\s*$/u,
         )
           ? textContentItem.str.replaceAll(
-              /(\p{P}*(?:\p{Unified_Ideograph}|\p{P})\p{P}*)(?:\s+|(\p{P}+))/gu,
+              /(\p{P}*(?:\p{Unified_Ideograph}|\p{P})?\p{P}*)(?:\s+|(\p{P}+))/gu,
               '$1$2',
             )
           : textContentItem.str,
@@ -75,7 +80,9 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
       textContentItem.hasEOL && textContentLines.push([mainStyles.length]);
     });
 
-    // TODO (Problem): No end of page
+    // TODO (Problem): No end of page (Only for main styles)
+    // textContentLines.at(-1).at(-1) !== mainStyles.length &&
+    //   tracker.alertIssue(jsonFilesFolderPath, 'No End of Page', pageNumber);
 
     // Integrate line data
     let mainIndex = 0;
@@ -113,8 +120,6 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
         },
         undefined,
       );
-
-      // TODO (Problem): Invalid baseline
 
       // Integrate items into line item
       const integratedLine = textContentLineItems.reduce(
@@ -206,8 +211,8 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
       // Trash lines
       trashItems.push(...integratedLine.trashItems);
 
-      // First of page
-      if (!prevLineOfSameStyle) {
+      // First of page in style or empty line
+      if (!prevLineOfSameStyle || integratedLine.lineItem.text.trim().length === 0) {
         integratedLine.styleIndex === 0 && mainStyles.length !== 0
           ? mainLineItems.push(integratedLine.lineItem)
           : integratedLine.styleIndex === mainStyles.length
@@ -299,6 +304,13 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
     );
     fs.writeFileSync(outputFilePath, transformedJson, 'utf-8');
   });
+
+  // Copy issues file
+  fs.existsSync(path.resolve(jsonFilesFolderPath, 'issues.json5')) &&
+    fs.writeFileSync(
+      path.resolve(outputFolderPath, path.basename(jsonFilesFolderPath), 'issues.json5'),
+      fs.readFileSync(path.resolve(jsonFilesFolderPath, 'issues.json5'), 'utf-8'),
+    );
 };
 
 const createLineItem = (
@@ -306,6 +318,10 @@ const createLineItem = (
   baseLine: number,
   horizontal: boolean,
 ) => {
+  // Alert issue
+  const issues: string[] = [];
+  textContentLineItem.str.match(/^\s+$/) !== null && issues.push('Empty Chunk Item');
+  (!baseLine || baseLine === 0) && issues.push('Invalid Baseline');
   return <LineItem>{
     // TODO: Remove align spaces
     text: textContentLineItem.str,
@@ -323,6 +339,7 @@ const createLineItem = (
         },
     // TODO: Check if there's more info about the EOP
     EOL: false,
+    issues: issues.length === 0 ? undefined : issues,
   };
 };
 
@@ -336,6 +353,13 @@ const appendLineItem = (
     ? Math.max(textContentLineItem.transform.at(4) + textContentLineItem.width, lineItem.pos.end)
     : // TODO: Check if the height value works properly with vertical direction
       Math.max(textContentLineItem.transform.at(5) + textContentLineItem.height, lineItem.pos.end);
+
+  // TODO: (Problem) Invalid empty item
+  (textContentLineItem.str.match(/^\s+$/) !== null &&
+    (lineItem.issues ?? (lineItem.issues = ['Empty Chunk Item']))?.find(
+      (issue) => issue === 'Empty Chunk Item',
+    )) ??
+    lineItem.issues.push('Empty Chunk Item');
   return lineItem;
 };
 

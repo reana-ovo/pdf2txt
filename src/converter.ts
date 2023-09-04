@@ -44,6 +44,8 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
       const textContent = JSON.stringify(
         await pdfPage.getTextContent({ disableNormalization: false }),
       );
+
+      // Output json to file
       const outputFilePath = path.resolve(outputFolderPath, page + '.json');
       fs.writeFileSync(outputFilePath, textContent);
 

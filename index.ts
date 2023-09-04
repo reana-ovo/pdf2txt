@@ -5,8 +5,6 @@ import * as converter from './src/converter.js';
 import * as transformer from './src/transformer.js';
 import * as extractor from './src/extractor.js';
 
-import * as scanner from './src/utils/scanner.js';
-
 const logFolderPath = path.resolve('log/');
 const originFolderPath = path.resolve('origin/');
 const convertFolderPath = path.resolve('.handling/convert/');
@@ -25,6 +23,7 @@ const workerAmount: number = Math.ceil(pdfFiles.length / ASYNC_POOL_SIZE);
 // Initialize logger
 logger.init(logFolderPath, workerAmount);
 
+// TODO: Worker queue
 // Process PDF files
 [...Array(workerAmount).keys()].reduce(async (prev, row) => {
   await prev;
@@ -32,23 +31,51 @@ logger.init(logFolderPath, workerAmount);
   // Update logger
   logger.updateWorker(row + 1);
 
+  // Create new worker
   const asyncWorker = pdfFiles
     .slice(row * ASYNC_POOL_SIZE, Math.min((row + 1) * ASYNC_POOL_SIZE, pdfFiles.length))
     .map(async (file) => {
-      const convertFilesFolderPath = path.resolve(convertFolderPath, file.replace(/\.pdf$/, ''));
-      const transformFilesFolderPath = path.resolve(
-        transformFolderPath,
-        file.replace(/\.pdf$/, ''),
-      );
+      // Create work with timeout
+      const work = new Promise<boolean>(async (resolve) => {
+        const timer = setTimeout(() => {
+          console.error(file + ': Timeout');
+          return resolve(false);
+        }, 6000);
 
-      const convertResult = await converter.pdf2jsonPages(
-        path.resolve(originFolderPath, file),
-        convertFilesFolderPath,
-      );
+        try {
+          // Resolve file paths
+          const convertFilesFolderPath = path.resolve(
+            convertFolderPath,
+            file.replace(/\.pdf$/, ''),
+          );
+          const transformFilesFolderPath = path.resolve(
+            transformFolderPath,
+            file.replace(/\.pdf$/, ''),
+          );
 
-      transformer.transform(convertFilesFolderPath, transformFolderPath);
-      extractor.extractText(transformFilesFolderPath, extractFolderPath);
-      return convertResult;
+          // Convert pdf
+          const convertResult = await converter.pdf2jsonPages(
+            path.resolve(originFolderPath, file),
+            convertFilesFolderPath,
+          );
+
+          // Extract data
+          convertResult &&
+            (transformer.transform(convertFilesFolderPath, transformFolderPath),
+            extractor.extractText(transformFilesFolderPath, extractFolderPath));
+
+          resolve(convertResult);
+        } catch (err) {
+          console.error(file + ': ' + err);
+          resolve(false);
+        } finally {
+          clearTimeout(timer);
+        }
+      });
+
+      return await work;
     });
+
+  // TODO: Deal with failure and timeout
   return await Promise.all(asyncWorker);
-}, Promise.resolve([true]));
+}, Promise.resolve(<boolean[]>[]));
