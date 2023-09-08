@@ -8,8 +8,8 @@ import * as extractor from './src/extractor.js';
 const logFolderPath = path.resolve('log/');
 const originFolderPath = path.resolve('origin/');
 const convertFolderPath = path.resolve('.handling/convert/');
-const transformFolderPath = path.resolve('.handling/transform/');
-const extractFolderPath = path.resolve('.handling/extract/');
+const transformFolderPath = path.resolve('export/transform/');
+const extractFolderPath = path.resolve('export/extract/');
 
 // Async size
 const ASYNC_POOL_SIZE = 4;
@@ -35,45 +35,25 @@ logger.init(logFolderPath, workerAmount);
   const asyncWorker = pdfFiles
     .slice(row * ASYNC_POOL_SIZE, Math.min((row + 1) * ASYNC_POOL_SIZE, pdfFiles.length))
     .map(async (file) => {
-      // Create work with timeout
-      const work = new Promise<boolean>(async (resolve) => {
-        const timer = setTimeout(() => {
-          console.error(file + ': Timeout');
-          return resolve(false);
-        }, 6000);
+      // Resolve file paths
+      const convertFilesFolderPath = path.resolve(convertFolderPath, file.replace(/\.pdf$/, ''));
+      const transformFilesFolderPath = path.resolve(
+        transformFolderPath,
+        file.replace(/\.pdf$/, ''),
+      );
 
-        try {
-          // Resolve file paths
-          const convertFilesFolderPath = path.resolve(
-            convertFolderPath,
-            file.replace(/\.pdf$/, ''),
-          );
-          const transformFilesFolderPath = path.resolve(
-            transformFolderPath,
-            file.replace(/\.pdf$/, ''),
-          );
+      // Convert pdf
+      const convertResult = await converter.pdf2jsonPages(
+        path.resolve(originFolderPath, file),
+        convertFilesFolderPath,
+      );
 
-          // Convert pdf
-          const convertResult = await converter.pdf2jsonPages(
-            path.resolve(originFolderPath, file),
-            convertFilesFolderPath,
-          );
+      // Extract data
+      convertResult &&
+        (transformer.transform(convertFilesFolderPath, transformFolderPath),
+        extractor.extractText(transformFilesFolderPath, extractFolderPath));
 
-          // Extract data
-          convertResult &&
-            (transformer.transform(convertFilesFolderPath, transformFolderPath),
-            extractor.extractText(transformFilesFolderPath, extractFolderPath));
-
-          resolve(convertResult);
-        } catch (err) {
-          console.error(file + ': ' + err);
-          resolve(false);
-        } finally {
-          clearTimeout(timer);
-        }
-      });
-
-      return await work;
+      return convertResult;
     });
 
   // TODO: Deal with failure and timeout
