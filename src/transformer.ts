@@ -11,6 +11,7 @@ const BASELINE_BIAS_FACT_THLD = 0.01;
 const LINEHEIGHT_BIAS_FACT_THLD = 0.05;
 const LINEEND_BIAS_FACT_THLD = 0.9;
 const LINESTART_BIAS_FACT_THLD = 0.9;
+const EMPTY_ITEM_WIDTH_FACT_THLD = 0.75;
 
 export const transform = (jsonFilesFolderPath: string, outputFolderPath: string) => {
   // Create output folder
@@ -320,7 +321,9 @@ const createLineItem = (
 ) => {
   // Alert issue
   const issues: string[] = [];
-  textContentLineItem.str.match(/^\s+$/) !== null && issues.push('Empty Chunk Item');
+  // Empty chunk item
+  textContentLineItem.str.match(/^\s+$/) !== null && issues.push('Empty Chunk Item?');
+  // TODO: (Issue) Empty line not considered
   (!baseLine || baseLine === 0) && issues.push('Invalid Baseline');
   return <LineItem>{
     // TODO: Remove align spaces
@@ -348,18 +351,35 @@ const appendLineItem = (
   textContentLineItem: TextContentItem,
   horizontal: boolean,
 ) => {
+  const prevLineEnd = lineItem.pos.end;
+
   lineItem.text += textContentLineItem.str;
   lineItem.pos.end = horizontal
     ? Math.max(textContentLineItem.transform.at(4) + textContentLineItem.width, lineItem.pos.end)
     : // TODO: Check if the height value works properly with vertical direction
       Math.max(textContentLineItem.transform.at(5) + textContentLineItem.height, lineItem.pos.end);
 
-  // TODO: (Problem) Invalid empty item
+  // Check empty chunk item
+  lineItem.issues?.find((issue) => issue === 'Empty Chunk Item?') &&
+    (lineItem.issues =
+      // Whether the empty item length greater than threshold
+      Math.abs(
+        (horizontal ? textContentLineItem.transform.at(4) : textContentLineItem.transform.at(5)) -
+          prevLineEnd,
+      ) >
+      // TODO: Use style data of size
+      EMPTY_ITEM_WIDTH_FACT_THLD * textContentLineItem.transform.at(0)
+        ? // Confirm the issue
+          lineItem.issues.map((issue) => issue.replaceAll('Empty Chunk Item?', 'Empty Chunk Item'))
+        : // Remove the issue
+          lineItem.issues.filter((issue) => issue !== 'Empty Chunk Item?'));
+
+  // Invalid empty item
   (textContentLineItem.str.match(/^\s+$/) !== null &&
-    (lineItem.issues ?? (lineItem.issues = ['Empty Chunk Item']))?.find(
-      (issue) => issue === 'Empty Chunk Item',
+    (lineItem.issues ?? (lineItem.issues = ['Empty Chunk Item?']))?.find((issue) =>
+      issue.includes('Empty Chunk Item'),
     )) ??
-    lineItem.issues.push('Empty Chunk Item');
+    lineItem.issues.push('Empty Chunk Item?');
   return lineItem;
 };
 

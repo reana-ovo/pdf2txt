@@ -1,5 +1,7 @@
 /origin
 /export
+/.handling
+/src.old
 /node_modules
 /.husky
 package*.json

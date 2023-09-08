@@ -38,7 +38,7 @@ export const init = (logFolderPath: string, workerAmount: number) => {
       '[' +
         new Date().toISOString() +
         ']<INFO>: ' +
-        logText +
+        logText.replaceAll(/\n+$/g, '') +
         '\n' +
         '[' +
         new Date().toISOString() +
