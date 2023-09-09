@@ -9,6 +9,7 @@ const logUpdateStream = logUpdate.createLogUpdate(process.stdout);
 const frames = ['⠁', '⠉', '⠙', '⠹', '⢹', '⣸', '⣴', '⣦', '⣇', '⡇', '⠇', '⠃'];
 
 let logText = '';
+let updatedLog = '';
 let frameIndex = 0;
 let lastFrameUpdate: number;
 let start: number;
@@ -38,7 +39,7 @@ export const init = (logFolderPath: string, workerAmount: number) => {
       '[' +
         new Date().toISOString() +
         ']<INFO>: ' +
-        logText.replaceAll(/\n+$/g, '') +
+        updatedLog.replaceAll(/\n+$/g, '') +
         '\n' +
         '[' +
         new Date().toISOString() +
@@ -51,9 +52,18 @@ export const init = (logFolderPath: string, workerAmount: number) => {
   // Rewrite console.error
   console.error = (...data: any[]) => {
     // Print current state
-    logFile.write('[' + new Date().toISOString() + ']<INFO>: ' + logText);
-    logFile.write('[' + new Date().toISOString() + ']<ERROR>: ');
-    logFile.write(util.format.apply(null, data) + '\n');
+    logFile.write(
+      '[' +
+        new Date().toISOString() +
+        ']<INFO>: ' +
+        updatedLog.replaceAll(/\n+$/g, '') +
+        '\n' +
+        '[' +
+        new Date().toISOString() +
+        ']<ERROR>: ' +
+        util.format.apply(null, data) +
+        '\n',
+    );
   };
 
   // TODO: zip and delete oversizing logs
@@ -107,6 +117,9 @@ export const updateLog = (name: string, state?: string, number?: number) => {
         .toString()
         .padStart(2, '0')}:${(((Date.now() - start) / 1000) % 60).toFixed(2).padStart(5, '0')}`,
   );
+
+  // Stage current log text
+  updatedLog = logText.match(logNameRegex).at(0);
 
   // Update frame change timer
   lastFrameUpdate =

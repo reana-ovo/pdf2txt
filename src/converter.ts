@@ -40,31 +40,36 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
         const rowResult = [
           ...Array(Math.min(pageAmount - row * MAX_PDFDOC_FUNCS, MAX_PDFDOC_FUNCS)).keys(),
         ].map(async (index) => {
-          // Extract text content to json
-          const page = row * MAX_PDFDOC_FUNCS + index + 1;
-          const pdfPage = await pdfDoc.getPage(page);
+          try {
+            // Extract text content to json
+            const page = row * MAX_PDFDOC_FUNCS + index + 1;
+            const pdfPage = await pdfDoc.getPage(page);
 
-          // Enable normalization
-          const textContent = JSON.stringify(
-            await pdfPage.getTextContent({ disableNormalization: false }),
-          );
+            // Enable normalization
+            const textContent = JSON.stringify(
+              await pdfPage.getTextContent({ disableNormalization: false }),
+            );
 
-          // Output json to file
-          const outputFilePath = path.resolve(outputFolderPath, page + '.json');
-          fs.writeFileSync(outputFilePath, textContent);
+            // Output json to file
+            const outputFilePath = path.resolve(outputFolderPath, page + '.json');
+            fs.writeFileSync(outputFilePath, textContent);
 
-          // Logging
-          logger.updateLog(path.basename(pdfFilePath, '.pdf'));
+            // Logging
+            logger.updateLog(path.basename(pdfFilePath, '.pdf'));
 
-          // Check if the output file is written correctly
-          return fs.readFileSync(outputFilePath, 'utf-8') === textContent && result;
+            // Check if the output file is written correctly
+            return fs.readFileSync(outputFilePath, 'utf-8') === textContent && result;
+          } catch (err) {
+            console.error(err);
+            return false;
+          }
         }, Promise.resolve(true));
         return (await Promise.all(rowResult)).reduce((prev, curr) => prev && curr, true) && result;
       },
       Promise.resolve(true),
     );
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return false;
   }
 };
