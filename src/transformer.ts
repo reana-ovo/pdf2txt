@@ -52,7 +52,7 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
         ...textContentItem,
         // Remove the align spaces
         str: textContentItem.str.match(
-          /^\s*(?:[^\p{Unified_Ideograph}\s]*\p{Unified_Ideograph}[^\p{Unified_Ideograph}\s]*(?:\s+|[^\p{Unified_Ideograph}\s]+))+[^\p{Unified_Ideograph}\s]*\p{Unified_Ideograph}[^\p{Unified_Ideograph}\s]*\s*$/u,
+          /^(?:\s|\p{M}|\p{S}|\p{P})*(?:\p{Unified_Ideograph}(?:\s|\p{M}|\p{S}|\p{P})+)+\p{Unified_Ideograph}(?:\s|\p{M}|\p{S}|\p{P})*$/u,
         )
           ? textContentItem.str.replaceAll(
               /((?:\p{S}|\p{M}|\p{P})*(?:\p{Unified_Ideograph}|\p{S}|\p{M}|\p{P})(?:\p{S}|\p{M}|\p{P})*)(?:\s+|((?:\p{S}|\p{M}|\p{P})+))/gu,
