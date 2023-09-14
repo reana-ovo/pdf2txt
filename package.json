@@ -1,6 +1,6 @@
 {
   "name": "zverse-ai-pdf2txt",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "handler": "ts-node --esm --files index.ts",
@@ -9,13 +9,12 @@
   "dependencies": {
     "lodash": "^4.17.21",
     "log-update": "^5.0.1",
-    "pdf2json": "^3.0.4",
     "pdfjs-dist": "^3.10.111"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
-    "@types/lodash": "^4.14.197",
+    "@types/lodash": "^4.14.198",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^8.0.3",
     "ts-node": "^10.9.1",
