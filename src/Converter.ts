@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import pdfjs from 'pdfjs-dist';
-import CMapReaderFactory from './patch/CMapReaderFactory.js';
 import * as Logger from './utils/Logger.js';
 
 const MAX_PDFDOC_FUNCS = 100;
@@ -18,11 +17,11 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
     const pdfDocLoader = pdfjs.getDocument({
       url: pdfFilePath,
       // Fix issue with foxit fonts
-      CMapReaderFactory,
-      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist/cmaps/',
+      cMapUrl: './node_modules/pdfjs-dist/cmaps/',
       cMapPacked: true,
-      useWorkerFetch: true,
+      // useWorkerFetch: true,
       disableFontFace: true,
+      useSystemFonts: true,
       fontExtraProperties: true,
     });
     const pdfDoc = await pdfDocLoader.promise;
