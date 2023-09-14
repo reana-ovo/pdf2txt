@@ -19,10 +19,11 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
       // Fix issue with foxit fonts
       cMapUrl: './node_modules/pdfjs-dist/cmaps/',
       cMapPacked: true,
+      standardFontDataUrl: './node_modules/pdfjs-dist/standard_fonts/',
       // useWorkerFetch: true,
-      disableFontFace: true,
-      useSystemFonts: true,
-      fontExtraProperties: true,
+      // disableFontFace: true,
+      // useSystemFonts: true,
+      // fontExtraProperties: true,
     });
     const pdfDoc = await pdfDocLoader.promise;
 
