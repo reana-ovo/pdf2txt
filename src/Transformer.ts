@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import lodash from 'lodash';
-import * as logger from './utils/logger.js';
-import * as scanner from './utils/scanner.js';
-import * as fileManager from './utils/fileManager.js';
-import * as tracker from './utils/tracker.js';
+import * as Logger from './utils/Logger.js';
+import * as Scanner from './utils/Scanner.js';
+import * as FileManager from './utils/FileManager.js';
+import * as Tracker from './utils/Tracker.js';
 
 // TODO: Testing value (Default: 0.01)
 const BASELINE_BIAS_FACT_THLD = 0.01;
@@ -21,23 +21,23 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
   });
 
   // Get main text style
-  const mainStyles = scanner.scanMainTextStyle(jsonFilesFolderPath);
+  const mainStyles = Scanner.scanMainTextStyle(jsonFilesFolderPath);
 
   // Logger
-  logger.updateLog(path.basename(jsonFilesFolderPath), 'transforming');
+  Logger.updateLog(path.basename(jsonFilesFolderPath), 'transforming');
 
   // Get all json files
-  const jsonFilesPath = fileManager
+  const jsonFilesPath = FileManager
     .getFiles(jsonFilesFolderPath, '.json')
     .map((jsonFile) => path.resolve(jsonFilesFolderPath, jsonFile));
 
   // Logger
-  logger.updateLog(path.basename(jsonFilesFolderPath), 'transforming', jsonFilesPath.length);
+  Logger.updateLog(path.basename(jsonFilesFolderPath), 'transforming', jsonFilesPath.length);
 
   // Transform json pages into line data
   jsonFilesPath.forEach((jsonFile) => {
     // Logger
-    logger.updateLog(path.basename(jsonFilesFolderPath));
+    Logger.updateLog(path.basename(jsonFilesFolderPath));
 
     // Get page number
     const pageNumber = Number.parseInt(jsonFile.match(/(\d+)\..*$/)?.at(1));
@@ -46,7 +46,7 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
     const textContentLines: [number, ...TextContentItem[]][] = [];
     // Init the first line with group trash
     textContentLines.push([mainStyles.length]);
-    scanner.textContentReader([jsonFile], (textContentItem, _prev, textContentStyles) => {
+    Scanner.textContentReader([jsonFile], (textContentItem, _prev, textContentStyles) => {
       // Push text content item into the last line
       textContentLines[textContentLines.length - 1].push({
         ...textContentItem,
@@ -67,7 +67,7 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
       mainStyles.forEach((mainStyle, index) => {
         // If the style matches
         lodash.isEqual(
-          scanner.getItemTextStyle(textContentItem, textContentStyles),
+          Scanner.getItemTextStyle(textContentItem, textContentStyles),
           mainStyle.textStyle,
         ) &&
           // Change the group number if it is smaller
@@ -106,7 +106,7 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
             textContentLineItem.dir === 'ltr' ? 5 : 4,
           );
           return lodash.isEqual(
-            scanner.getItemTextStyle(textContentLineItem),
+            Scanner.getItemTextStyle(textContentLineItem),
             mainStyles.at(styleIndex)?.textStyle,
           ) && // Empty item not considered
             textContentLineItem.str.trim().length !== 0
@@ -138,7 +138,7 @@ export const transform = (jsonFilesFolderPath: string, outputFolderPath: string)
           (Math.abs(baseline - itemBaseline) <
             BASELINE_BIAS_FACT_THLD * mainStyles.at(styleIndex).textStyle.size ||
             lodash.isEqual(
-              scanner.getItemTextStyle(textContentLineItem),
+              Scanner.getItemTextStyle(textContentLineItem),
               mainStyles.at(styleIndex).textStyle,
             ))
             ? styleIndex === 0
@@ -412,7 +412,7 @@ const createTrashItem = (
     mainPos: mainIndex,
     inline,
     text: textContentLineItem.str,
-    textStyle: scanner.getItemTextStyle(textContentLineItem),
+    textStyle: Scanner.getItemTextStyle(textContentLineItem),
     pos:
       textContentLineItem.dir === 'ltr'
         ? {

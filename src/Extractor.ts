@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import * as logger from './utils/logger.js';
-import * as fileManager from './utils/fileManager.js';
+import * as Logger from './utils/Logger.js';
+import * as FileManager from './utils/FileManager.js';
 
 export const extractText = (jsonFilesFolderPath: string, outputFolderPath: string) => {
   // Create output folder
@@ -10,20 +10,20 @@ export const extractText = (jsonFilesFolderPath: string, outputFolderPath: strin
   });
 
   // Logger
-  logger.updateLog(path.basename(jsonFilesFolderPath), 'extracting');
+  Logger.updateLog(path.basename(jsonFilesFolderPath), 'extracting');
 
   // Get all json files
-  const jsonFilesPath = fileManager
+  const jsonFilesPath = FileManager
     .getFiles(jsonFilesFolderPath, '.json')
     .map((jsonFile) => path.resolve(jsonFilesFolderPath, jsonFile));
 
   // Logger
-  logger.updateLog(path.basename(jsonFilesFolderPath), 'extracting', jsonFilesPath.length);
+  Logger.updateLog(path.basename(jsonFilesFolderPath), 'extracting', jsonFilesPath.length);
 
   // Read json file data
   jsonFilesPath.forEach((jsonFilePath) => {
     // Logger
-    logger.updateLog(path.basename(jsonFilesFolderPath));
+    Logger.updateLog(path.basename(jsonFilesFolderPath));
 
     // Get grouped lines
     const groupedLines: GroupedLines = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));

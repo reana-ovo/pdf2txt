@@ -1,9 +1,9 @@
 import path from 'path';
-import * as logger from './src/utils/logger.js';
-import * as fileManager from './src/utils/fileManager.js';
-import * as converter from './src/converter.js';
-import * as transformer from './src/transformer.js';
-import * as extractor from './src/extractor.js';
+import * as Logger from './src/utils/Logger.js';
+import * as FileManager from './src/utils/FileManager.js';
+import * as Converter from './src/Converter.js';
+import * as Transformer from './src/Transformer.js';
+import * as Extractor from './src/Extractor.js';
 
 const logFolderPath = path.resolve('log/');
 const originFolderPath = path.resolve('origin/');
@@ -15,13 +15,13 @@ const extractFolderPath = path.resolve('export/extract/');
 const ASYNC_POOL_SIZE = 4;
 
 // Get PDF files
-const pdfFiles = fileManager.getFiles(originFolderPath, '.pdf');
+const pdfFiles = FileManager.getFiles(originFolderPath, '.pdf');
 
 // Worker Size
 const workerAmount: number = Math.ceil(pdfFiles.length / ASYNC_POOL_SIZE);
 
 // Initialize logger
-logger.init(logFolderPath, workerAmount);
+Logger.init(logFolderPath, workerAmount);
 
 // TODO: Worker queue
 // Process PDF files
@@ -29,7 +29,7 @@ logger.init(logFolderPath, workerAmount);
   await prev;
 
   // Update logger
-  logger.updateWorker(row + 1);
+  Logger.updateWorker(row + 1);
 
   // Create new worker
   const asyncWorker = pdfFiles
@@ -43,15 +43,15 @@ logger.init(logFolderPath, workerAmount);
       );
 
       // Convert pdf
-      const convertResult = await converter.pdf2jsonPages(
+      const convertResult = await Converter.pdf2jsonPages(
         path.resolve(originFolderPath, file),
         convertFilesFolderPath,
       );
 
       // Extract data
       convertResult &&
-        (transformer.transform(convertFilesFolderPath, transformFolderPath),
-        extractor.extractText(transformFilesFolderPath, extractFolderPath));
+        (Transformer.transform(convertFilesFolderPath, transformFolderPath),
+        Extractor.extractText(transformFilesFolderPath, extractFolderPath));
 
       return convertResult;
     });

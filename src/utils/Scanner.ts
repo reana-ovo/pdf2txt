@@ -1,19 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 import lodash from 'lodash';
-import * as logger from './logger.js';
-import * as fileManager from './fileManager.js';
-import * as tracker from './tracker.js';
+import * as Logger from './Logger.js';
+import * as FileManager from './FileManager.js';
+import * as Tracker from './Tracker.js';
 
 // TODO: Testing value (default 3);
 const FREQ_PER_PAGE_THLD = 3;
 
 export const scanMainTextStyle = (jsonFilesFolderPath: string) => {
   // Logger
-  logger.updateLog(path.basename(jsonFilesFolderPath), 'scanning');
+  Logger.updateLog(path.basename(jsonFilesFolderPath), 'scanning');
 
   // Get all json files
-  const jsonFilesPath = fileManager
+  const jsonFilesPath = FileManager
     .getFiles(jsonFilesFolderPath, '.json')
     .map((jsonFile) => path.resolve(jsonFilesFolderPath, jsonFile));
   const pageAmount = jsonFilesPath.length;
@@ -28,7 +28,7 @@ export const scanMainTextStyle = (jsonFilesFolderPath: string) => {
   });
 
   // TODO (Problem): No text style
-  textStyles?.length !== 0 || tracker.alertIssue(jsonFilesFolderPath, 'No Possible Main Style');
+  textStyles?.length !== 0 || Tracker.alertIssue(jsonFilesFolderPath, 'No Possible Main Style');
 
   // Get possible main text styles
   const possibleTextStyles: TextStyle[] = textStyles
@@ -42,7 +42,7 @@ export const scanMainTextStyle = (jsonFilesFolderPath: string) => {
   // TODO (Problem): No text styles matches the frequency threshold
   possibleTextStyles?.length !== 0 ||
     (textStyles?.length !== 0 &&
-      tracker.alertIssue(jsonFilesFolderPath, 'Invalid Possible Main Style'));
+      Tracker.alertIssue(jsonFilesFolderPath, 'Invalid Possible Main Style'));
 
   // Get possible line height for every main styles
   const mainStyles: MainStyle[] = possibleTextStyles?.map((style) => {
@@ -62,7 +62,7 @@ export const scanMainTextStyle = (jsonFilesFolderPath: string) => {
     });
 
     // TODO (Problem): No line heights
-    lineHeights?.length !== 0 || tracker.alertIssue(jsonFilesFolderPath, 'No Possible Line Height');
+    lineHeights?.length !== 0 || Tracker.alertIssue(jsonFilesFolderPath, 'No Possible Line Height');
 
     // Get possible line height
     const possibleLineHeight = lineHeights
@@ -77,7 +77,7 @@ export const scanMainTextStyle = (jsonFilesFolderPath: string) => {
     // TODO (Problem): No valid line heights
     possibleLineHeight ??
       (lineHeights?.length !== 0 &&
-        tracker.alertIssue(jsonFilesFolderPath, 'Invalid Possible Line Height'));
+        Tracker.alertIssue(jsonFilesFolderPath, 'Invalid Possible Line Height'));
 
     return { textStyle: style, lineHeight: possibleLineHeight };
   });

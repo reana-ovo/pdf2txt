@@ -1,13 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import pdfjs, { PDFDocumentProxy } from 'pdfjs-dist';
-import * as logger from './utils/logger.js';
+import pdfjs from 'pdfjs-dist';
+import CMapReaderFactory from './patch/CMapReaderFactory.js';
+import * as Logger from './utils/Logger.js';
 
 const MAX_PDFDOC_FUNCS = 100;
 
 export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: string) => {
   // Logger
-  logger.updateLog(path.basename(pdfFilePath, '.pdf'), 'converting');
+  Logger.updateLog(path.basename(pdfFilePath, '.pdf'), 'converting');
 
   // Create output folder
   fs.mkdirSync(outputFolderPath, { recursive: true });
@@ -16,11 +17,13 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
     // Create PDF loader
     const pdfDocLoader = pdfjs.getDocument({
       url: pdfFilePath,
-      // CMapReaderFactory,
-      // cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist/cmaps/',
-      // cMapPacked: true,
+      // Fix issue with foxit fonts
+      CMapReaderFactory,
+      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist/cmaps/',
+      cMapPacked: true,
       useWorkerFetch: true,
-      // fontExtraProperties: true,
+      disableFontFace: true,
+      fontExtraProperties: true,
     });
     const pdfDoc = await pdfDocLoader.promise;
 
@@ -28,7 +31,7 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
     const pageAmount = pdfDoc.numPages;
 
     // Logger
-    logger.updateLog(path.basename(pdfFilePath, '.pdf'), 'converting', pageAmount);
+    Logger.updateLog(path.basename(pdfFilePath, '.pdf'), 'converting', pageAmount);
 
     // Convert every page of the pdf file to json
     return [...Array(Math.ceil(pageAmount / MAX_PDFDOC_FUNCS)).keys()].reduce(
@@ -55,7 +58,7 @@ export const pdf2jsonPages = async (pdfFilePath: string, outputFolderPath: strin
             fs.writeFileSync(outputFilePath, textContent);
 
             // Logging
-            logger.updateLog(path.basename(pdfFilePath, '.pdf'));
+            Logger.updateLog(path.basename(pdfFilePath, '.pdf'));
 
             // Check if the output file is written correctly
             return fs.readFileSync(outputFilePath, 'utf-8') === textContent && result;
